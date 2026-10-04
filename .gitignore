@@ -1,0 +1,35 @@
+# AI assistant files and settings (kept local, never committed)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.mcp.json
+AGENTS.md
+GEMINI.md
+.gemini/
+.cursor/
+.cursorrules
+.cursorignore
+.windsurfrules
+.github/copilot-instructions.md
+.aider*
+.continue/
+.codex/
+
+# Packaged builds
+*.zip
+*.crx
+*.xpi
+*.pem
+web-ext-artifacts/
+
+# Node (if tooling gets added)
+node_modules/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
