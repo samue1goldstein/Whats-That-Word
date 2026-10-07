@@ -22,9 +22,6 @@ GEMINI.md
 *.pem
 web-ext-artifacts/
 
-# Node (if tooling gets added)
-node_modules/
-
 # OS / editor junk
 .DS_Store
 Thumbs.db

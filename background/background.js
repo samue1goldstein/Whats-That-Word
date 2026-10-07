@@ -1,8 +1,4 @@
-const WIKTIONARY_API = 'https://en.wiktionary.org/api/rest_v1/page/definition/',
-
-    DEFAULT_HISTORY_SETTING = {
-        enabled: true
-    };
+const WIKTIONARY_API = 'https://en.wiktionary.org/api/rest_v1/page/definition/';
 
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const word = request.word.trim(),
@@ -19,11 +15,7 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
         .then((content) => {
             sendResponse({ content });
 
-            content && browser.storage.local.get().then((results) => {
-                let history = results.history || DEFAULT_HISTORY_SETTING;
-
-                history.enabled && saveWord(content)
-            });
+            content && saveWord(content);
         })
         .catch(() => sendResponse({ content: null }));
 
@@ -36,20 +28,20 @@ function lookup (word, lang, userLanguageOnly) {
             headers: { 'Api-User-Agent': 'DictionaryAnywhere-fork (https://github.com/samue1goldstein/Dictionary)' }
         })
         .then((response) => response.ok ? response.json() : null)
-        .then((data) => data && extractMeaning(userLanguageOnly ? { [lang]: data[lang] || [] } : data, { word, lang }));
+        .then((data) => data && extractMeaning(userLanguageOnly ? { [lang]: data[lang] || [] } : data, word, lang));
 }
 
 // Response is keyed by language code: { fr: [{ partOfSpeech, language, definitions: [{ definition: "<html>" }] }], en: [...], other: [...] }
-function extractMeaning (data, context) {
+function extractMeaning (data, word, lang) {
     // Prefer the user's language, then English, then whatever Wiktionary lists ("other" holds obscure languages).
-    const entries = [].concat(data[context.lang] || [], data.en || [], ...Object.values(data));
+    const entries = [].concat(data[lang] || [], data.en || [], ...Object.values(data));
 
     for (const entry of entries) {
         for (const def of entry.definitions || []) {
             const meaning = stripHtml(def.definition);
 
             if (meaning) {
-                return { word: context.word, meaning: meaning[0].toUpperCase() + meaning.substring(1), audioSrc: null };
+                return { word, meaning: meaning[0].toUpperCase() + meaning.substring(1) };
             }
         }
     }
@@ -61,18 +53,11 @@ function stripHtml (html) {
     return new DOMParser().parseFromString(html || '', 'text/html').body.textContent.trim();
 }
 
-function saveWord (content) {
-    let word = content.word,
-        meaning = content.meaning,
+async function saveWord ({ word, meaning }) {
+    const { history = { enabled: true }, definitions = {} } = await browser.storage.local.get(['history', 'definitions']);
 
-        storageItem = browser.storage.local.get('definitions');
+    if (!history.enabled) { return; }
 
-        storageItem.then((results) => {
-            let definitions = results.definitions || {};
-
-            definitions[word] = meaning;
-            browser.storage.local.set({
-                definitions
-            });
-        })
+    definitions[word] = meaning;
+    browser.storage.local.set({ definitions });
 }

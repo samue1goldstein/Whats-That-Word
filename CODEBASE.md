@@ -8,7 +8,7 @@ Manifest V2. Uses the `browser.*` promise API (Firefox native; Chrome via the po
 | File | Runs in | What it does |
 |---|---|---|
 | `manifest.json` | — | MV2 manifest, v1.2.0. Content script on `<all_urls>`, non-persistent background (event page), permissions `storage` + `https://en.wiktionary.org/`. Gecko ID `dictionary-anywhere-fork@samue1goldstein`. |
-| `content_scripts/dictionary.js` | every page | Listens for `dblclick`, reads the selection, sends `{word, lang, time}` to the background, draws the pop-up in a shadow DOM. |
+| `content_scripts/dictionary.js` | every page | Listens for `dblclick`, reads the selection, sends `{word, lang}` to the background, draws the pop-up in a shadow DOM. |
 | `background/background.js` | background event page | Receives the message, looks the word up via the Wiktionary REST API (`en.wiktionary.org/api/rest_v1/page/definition/<word>`), replies `{content}`, saves to history. |
 | `options/options.html/.js/.css` | options page | Language, trigger key, history on/off, download/clear history. |
 | `common/browser-polyfill.js` | all contexts | Mozilla webextension-polyfill (MPL-2.0, third-party, don't edit). No-op in Firefox. |
@@ -17,20 +17,20 @@ Manifest V2. Uses the `browser.*` promise API (Firefox native; Chrome via the po
 ## Flow
 
 ```
-dblclick (dictionary.js:195)
+dblclick (dictionary.js:181)
   -> ignored if the target is editable (input/textarea/select/contenteditable)
   -> TRIGGER_KEY check ('none' or e[`${key}Key`])
   -> showMeaning (:7)
        getSelectionInfo (:25)   trimmed selection text + bounding rect (needs non-empty)
-       retrieveMeaning (:56)    browser.runtime.sendMessage({word, lang, time})
-       createDiv (:60)          pop-up with the word + "Looking up…", shown immediately
-  -> background onMessage (background.js:7)
-       lookup (:33) x up to 3: lowercase/original casing in user's lang, then original casing in any lang
-       extractMeaning (:43)     sendResponse({content})  content = {word, meaning, audioSrc: null} | null
+       sendMessage (:13)        browser.runtime.sendMessage({word, lang})
+       createDiv (:53)          pop-up with the word + "Looking up…", shown immediately
+  -> background onMessage (background.js:3)
+       lookup (:25) x up to 3: lowercase/original casing in user's lang, then original casing in any lang
+       extractMeaning (:35)     sendResponse({content})  content = {word, meaning} | null
        errors -> sendResponse({content: null})
-       saveWord (:64) if history enabled
-  -> appendToDiv (dictionary.js:166) or noMeaningFound (:172, shows "Search Wiktionary »")
-click anywhere not on the popup, or Escape -> removeAllPopups (:185) removes all .dictionaryDiv
+       saveWord (:56) checks history setting, then saves
+  -> appendToDiv (dictionary.js:152) or noMeaningFound (:158, shows "Search Wiktionary »")
+click anywhere not on the popup, or Escape -> removeAllPopups (:171) removes all .dictionaryDiv
 ```
 
 ## Definition source (background.js)
@@ -39,7 +39,7 @@ click anywhere not on the popup, or Escape -> removeAllPopups (:185) removes all
 - Response is keyed by language code (`en`, `fr`, `de`, `es`, ..., `other`). `extractMeaning` takes the first non-empty definition, preferring the user's language, then `en`, then anything.
 - Definitions are HTML; `stripHtml` reduces them to text with `DOMParser` (never `innerHTML`).
 - Titles are case-sensitive. German tries the original casing first (nouns are capitalized: "Haus"), other languages try lowercase first (sentence-initial "Dog").
-- No audio: `audioSrc` is always `null`, so the speaker icon never shows.
+- No audio (Wiktionary has none).
 - 404 = no entry. Sends `Api-User-Agent` as Wikimedia asks; `credentials: 'omit'`.
 
 ## Storage (`browser.storage.local`)
@@ -52,7 +52,7 @@ click anywhere not on the popup, or Escape -> removeAllPopups (:185) removes all
   definitions: { [word]: meaning }                 // history, written by background saveWord
 }
 ```
-The content script reads `language` and `interaction` **once** at injection (dictionary.js:214). Changed settings only apply to tabs loaded afterwards.
+The content script reads `language` and `interaction` **once** at injection (dictionary.js:192). Changed settings only apply to tabs loaded afterwards.
 
 ## Pop-up UI
 
@@ -73,4 +73,4 @@ The content script reads `language` and `interaction` **once** at injection (dic
 - Firefox: `about:debugging#/runtime/this-firefox` -> Load Temporary Add-on -> `manifest.json`. Background console: "Inspect".
 - Chrome: `chrome://extensions` -> Developer mode -> Load unpacked. (Recent Chrome versions no longer run MV2.)
 
-Known bugs: `BUGREPORT.md`. Why the Google version broke: `FIREFOX_BROKEN.md`.
+Known bugs: `BUGREPORT.md`. Why the Google version broke: see git history of `FIREFOX_BROKEN.md` (removed).

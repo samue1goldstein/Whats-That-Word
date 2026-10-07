@@ -1,7 +1,3 @@
-body {
-	background-color: #eee
-}
-
 #content {
 	background-color: #fff;
 	border: 1px solid #ccc;
@@ -46,10 +42,6 @@ body {
 	margin: 5px 0 0 40px
 }
 
-.text-disabled {
-	opacity: 0.6
-}
-
 .btn-row {
 	margin-top: 40px;
 	height: 30px
@@ -78,16 +70,12 @@ body {
 	transition: none
 }
 
-.footer {
-	margin-top: 10px;
-	text-align: center
-}
-
 * {
 	box-sizing: border-box
 }
 
 body {
+	background-color: #eee;
 	color: #222;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 13px
@@ -132,13 +120,6 @@ a:hover {
 	.btn:active {
 		transform: none
 	}
-}
-
-.btn[disabled] {
-	pointer-events: none;
-	cursor: not-allowed;
-	box-shadow: none;
-	opacity: 0.6
 }
 
 .btn-default {

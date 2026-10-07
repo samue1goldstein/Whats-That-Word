@@ -8,12 +8,7 @@ const DEFAULT_LANGUAGE = 'en',
     RESET_OPTIONS_BUTTON = document.querySelector("#reset-btn"),
 
     CLEAR_HISTORY_BUTTON = document.querySelector("#clear-history-btn"),
-    DOWNLOAD_HISTORY_BUTTON = document.querySelector("#download-history-btn"),
-
-    OS_MAC = 'mac',
-
-    KEY_COMMAND = 'Command',
-    KEY_META = 'meta';
+    DOWNLOAD_HISTORY_BUTTON = document.querySelector("#download-history-btn");
 
 
 
@@ -46,11 +41,7 @@ function saveOptions(e) {
         document.querySelector("#language-selector").value = language || DEFAULT_LANGUAGE;
 
         // interaction
-        // document.querySelector("#popup-dblclick-checkbox").checked = interaction.dblClick.enabled;
         document.querySelector("#popup-dblclick-key").value = (interaction.dblClick && interaction.dblClick.key) || DEFAULT_TRIGGER_KEY;
-        
-        // document.querySelector("#popup-select-checkbox").checked = interaction.select.enabled;
-        // document.querySelector("#popup-select-key").value = interaction.select.key;
 
         // history
         document.querySelector("#store-history-checkbox").checked = history.enabled;
@@ -59,22 +50,11 @@ function saveOptions(e) {
   }
   
   function downloadHistory (e) {
-    let fileContent = "" 
-        storageItem = browser.storage.local.get("definitions"),
-        anchorTag = document.querySelector("#download-history-link");
+    let anchorTag = document.querySelector("#download-history-link");
 
-    storageItem.then((results) => {
-        let definitions = results.definitions || {};
-
-        for (definition in definitions) {
-            if (!definitions.hasOwnProperty(definition)) { return; }
-
-            fileContent += definition;
-            fileContent += "\t";
-            fileContent += "\t";
-            fileContent += definitions[definition];
-            fileContent += "\n";
-        }
+    browser.storage.local.get("definitions").then((results) => {
+        let fileContent = Object.entries(results.definitions || {})
+            .map(([word, meaning]) => `${word}\t\t${meaning}\n`).join("");
 
         anchorTag.href = window.URL.createObjectURL(new Blob([fileContent],{
             type: "text/plain"
@@ -87,17 +67,8 @@ function saveOptions(e) {
   }
 
   function resetOptions (e) {
-    browser.storage.local.set({
-        language: DEFAULT_LANGUAGE,
-        interaction: {
-            dblClick: {
-                key: DEFAULT_TRIGGER_KEY
-            }
-        },
-        history: {
-            enabled: IS_HISTORY_ENABLED_BY_DEFAULT
-        }
-    }).then(restoreOptions);
+    // Every reader falls back to the defaults when a setting is missing.
+    browser.storage.local.remove(["language", "interaction", "history"]).then(restoreOptions);
 
     e.preventDefault();
   }
@@ -122,7 +93,7 @@ function saveOptions(e) {
   SAVE_OPTIONS_BUTTON.addEventListener("click", saveOptions);
   RESET_OPTIONS_BUTTON.addEventListener("click", resetOptions);
 
-  if (window.navigator.platform.toLowerCase().includes(OS_MAC)) {
-    document.getElementById("popup-dblclick-key-ctrl").textContent = KEY_COMMAND;
-    document.getElementById("popup-dblclick-key-ctrl").value = KEY_META;
+  if (window.navigator.platform.toLowerCase().includes("mac")) {
+    document.getElementById("popup-dblclick-key-ctrl").textContent = "Command";
+    document.getElementById("popup-dblclick-key-ctrl").value = "meta";
   }
