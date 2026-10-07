@@ -40,7 +40,10 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "dictionary-anywhere-fork@samue1goldstein"
+      "id": "dictionary-anywhere-fork@samue1goldstein",
+      "data_collection_permissions": {
+        "required": ["websiteContent"]
+      }
     }
   },
 
