@@ -11,8 +11,8 @@
         if (!info) { return; }
 
         retrieveMeaning(info)
-            .then((response) => {                
-                if (!response.content) { return noMeaningFound(createdDiv); }
+            .then((response) => {
+                if (!response || !response.content) { return noMeaningFound(createdDiv); }
 
                 appendToDiv(createdDiv, response.content);
             });
@@ -26,8 +26,8 @@
         var word;
         var boundingRect;
 
-        if (window.getSelection().toString().length > 1) {
-            word = window.getSelection().toString();
+        if (window.getSelection().toString().trim().length > 0) {
+            word = window.getSelection().toString().trim();
             boundingRect = getSelectionCoords(window.getSelection());
         } else {
             return null;
@@ -108,7 +108,7 @@
         audio.style.display = "none";
 
         var moreInfo =document.createElement("a");
-        moreInfo.href = `https://www.google.com/search?hl=${LANGUAGE}&q=define+${info.word}`;
+        moreInfo.href = `https://en.wiktionary.org/wiki/${encodeURIComponent(info.word)}`;
         moreInfo.style = "float: right; text-decoration: none;"
         moreInfo.target = "_blank";
 

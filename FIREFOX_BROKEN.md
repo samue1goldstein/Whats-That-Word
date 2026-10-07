@@ -1,5 +1,7 @@
 # Why the extension no longer works (Firefox)
 
+> **Fixed 2026-10-07:** `background/background.js` now uses the Wiktionary REST API as recommended below. Kept for history.
+
 ## Symptom
 Double-clicking a word shows "Searching / Please Wait...", then "Sorry, No definition found." for every word. Depending on the response, it can also stay stuck on "Please Wait...".
 

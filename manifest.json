@@ -38,8 +38,14 @@
     "persistent": false
   },
 
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "dictionary-anywhere-fork@samue1goldstein"
+    }
+  },
+
   "permissions": [
     "storage",
-    "https://www.google.com/"
+    "https://en.wiktionary.org/"
   ]
 }

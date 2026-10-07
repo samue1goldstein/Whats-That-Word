@@ -7,6 +7,9 @@ Extension is available for [Google Chrome](https://chrome.google.com/webstore/de
 
 ##### Enjoy Reading Uninterrupted!!!
 
+## Changes in this fork
+Modified by samue1goldstein, 2026-10-07: definitions now come from the Wiktionary API instead of scraping Google (which stopped working), added a Firefox add-on ID, and fixed the pop-up hanging on errors. Pronunciation audio was removed (no source).
+
 ## Support Me
 If you find this Extension helpful, consider supporting me:
 
