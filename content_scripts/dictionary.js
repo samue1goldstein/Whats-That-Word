@@ -79,6 +79,12 @@
                 }
             }
 
+            /* "Looking up." -> ".." -> "..." loop. Hidden dots keep their width so the text doesn't shift. */
+            .dots span:nth-child(2) { animation: dot2 1.2s step-end infinite; }
+            .dots span:nth-child(3) { animation: dot3 1.2s step-end infinite; }
+            @keyframes dot2 { 0% { opacity: 0; } 33% { opacity: 1; } }
+            @keyframes dot3 { 0% { opacity: 0; } 66% { opacity: 1; } }
+
             @media (prefers-color-scheme: dark) {
                 .wrap { text-shadow: none !important; }
                 .mwe-popups { background: #2b2a33; }
@@ -119,7 +125,11 @@
 
         var meaning = document.createElement("p");
         meaning.style = "margin-top: 10px";
-        meaning.textContent = "Looking up…";
+        // appendToDiv/noMeaningFound replace textContent, which removes the dots and stops the animation.
+        var dots = document.createElement("span");
+        dots.className = "dots";
+        dots.append(...[".", ".", "."].map((dot) => Object.assign(document.createElement("span"), { textContent: dot })));
+        meaning.append("Looking up", dots);
 
         var moreInfo =document.createElement("a");
         moreInfo.href = `https://en.wiktionary.org/wiki/${encodeURIComponent(info.word)}`;
