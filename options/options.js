@@ -109,12 +109,9 @@ function saveOptions(e) {
   }
 
   function showSaveStatusAnimation () {
-    SAVE_STATUS.style.setProperty("-webkit-transition", "opacity 0s ease-out");
-    SAVE_STATUS.style.opacity = 1;
-    window.setTimeout(function() {
-        SAVE_STATUS.style.setProperty("-webkit-transition", "opacity 0.4s ease-out");
-        SAVE_STATUS.style.opacity = 0
-    }, 1500);
+    // Appears instantly, fades out (options.css).
+    SAVE_STATUS.classList.add("shown");
+    window.setTimeout(() => SAVE_STATUS.classList.remove("shown"), 1500);
   }
 
   document.addEventListener('DOMContentLoaded', restoreOptions);

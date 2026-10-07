@@ -2,7 +2,7 @@
 
 Found by reading the code (v1.2.0, commit `89e91f9`). Severity: **Critical** = extension doesn't work, **High** = visible breakage, **Medium** = wrong behaviour in some cases, **Low** = cleanup.
 
-> **Fixed 2026-10-07 (Wiktionary switch):** #1, #2, #3 (code removed), #4, #10, #15, #16, #19. #5 partly: selection is trimmed and one-letter words work, but there's still no character/length check.
+> **Fixed 2026-10-07 (Wiktionary switch):** #1, #2, #3 (code removed), #4, #10, #15, #16, #17, #19. #5 partly: selection is trimmed and one-letter words work, but there's still no character/length check.
 
 ## Critical
 

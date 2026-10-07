@@ -17,20 +17,20 @@ Manifest V2. Uses the `browser.*` promise API (Firefox native; Chrome via the po
 ## Flow
 
 ```
-dblclick (dictionary.js:202)
+dblclick (dictionary.js:195)
   -> ignored if the target is editable (input/textarea/select/contenteditable)
   -> TRIGGER_KEY check ('none' or e[`${key}Key`])
   -> showMeaning (:7)
        getSelectionInfo (:25)   trimmed selection text + bounding rect (needs non-empty)
        retrieveMeaning (:56)    browser.runtime.sendMessage({word, lang, time})
-       createDiv (:60)          "Searching / Please Wait..." pop-up, shown immediately
+       createDiv (:60)          pop-up with the word + "Looking up…", shown immediately
   -> background onMessage (background.js:7)
        lookup (:33) x up to 3: lowercase/original casing in user's lang, then original casing in any lang
        extractMeaning (:43)     sendResponse({content})  content = {word, meaning, audioSrc: null} | null
        errors -> sendResponse({content: null})
        saveWord (:64) if history enabled
-  -> appendToDiv (dictionary.js:152) or noMeaningFound (:179, shows "Search Wiktionary »")
-click anywhere not on the popup, or Escape -> removeAllPopups (:192) removes all .dictionaryDiv
+  -> appendToDiv (dictionary.js:166) or noMeaningFound (:172, shows "Search Wiktionary »")
+click anywhere not on the popup, or Escape -> removeAllPopups (:185) removes all .dictionaryDiv
 ```
 
 ## Definition source (background.js)
@@ -52,13 +52,15 @@ click anywhere not on the popup, or Escape -> removeAllPopups (:192) removes all
   definitions: { [word]: meaning }                 // history, written by background saveWord
 }
 ```
-The content script reads `language` and `interaction` **once** at injection (dictionary.js:221). Changed settings only apply to tabs loaded afterwards.
+The content script reads `language` and `interaction` **once** at injection (dictionary.js:214). Changed settings only apply to tabs loaded afterwards.
 
 ## Pop-up UI
 
 - `div.dictionaryDiv` (absolute, z-index 1e6) on `document.body`, with an open shadow root holding inline CSS (`.mwe-popups*` classes, copied from Wikipedia's page previews).
 - Placed below the word if it's in the top half of the viewport (`mwe-popups-no-image-tri`), above otherwise (`flipped_y`).
-- `appendToDiv` finds the popup via `getRootNode().querySelectorAll("div")[1]`, which depends on element order.
+- `flipped_y` uses `transform: translateY(-100%)`, so `top` is the popup's bottom edge and it grows upward as content arrives (no re-measuring).
+- Entrance: 150ms opacity + `scale(0.97)` from the arrow via `@starting-style` (Firefox 129+; older versions just skip it). Reduced motion: fade only.
+- Dark colors under `prefers-color-scheme: dark`. No audio button (Wiktionary has no audio).
 - "More »" links to `en.wiktionary.org/wiki/<word>`.
 
 ## Options page

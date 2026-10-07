@@ -69,11 +69,38 @@
         var shadow = hostDiv.shadowRoot;
         var style = document.createElement("style");
         //style.textContent = "*{ all: initial}";
-        style.textContent = ".mwe-popups{background:#fff;position:absolute;z-index:110;-webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;padding:0;font-size:14px;min-width:300px;border-radius:2px}.mwe-popups.mwe-popups-is-not-tall{width:320px}.mwe-popups .mwe-popups-container{color:#222;margin-top:-9px;padding-top:9px;text-decoration:none}.mwe-popups.mwe-popups-is-not-tall .mwe-popups-extract{min-height:40px;max-height:140px;overflow:hidden;margin-bottom:47px;padding-bottom:0}.mwe-popups .mwe-popups-extract{margin:16px;display:block;color:#222;text-decoration:none;position:relative} .mwe-popups.flipped_y:before{content:'';position:absolute;border:8px solid transparent;border-bottom:0;border-top: 8px solid #a2a9b1;bottom:-8px;left:10px}.mwe-popups.flipped_y:after{content:'';position:absolute;border:11px solid transparent;border-bottom:0;border-top:11px solid #fff;bottom:-7px;left:7px} .mwe-popups.mwe-popups-no-image-tri:before{content:'';position:absolute;border:8px solid transparent;border-top:0;border-bottom: 8px solid #a2a9b1;top:-8px;left:10px}.mwe-popups.mwe-popups-no-image-tri:after{content:'';position:absolute;border:11px solid transparent;border-top:0;border-bottom:11px solid #fff;top:-7px;left:7px} .audio{background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=);background-position: center;background-repeat: no-repeat;cursor:pointer;margin-left: 8px;opacity: 0.5; width: 16px; display: inline-block;} .audio:hover {opacity: 1;}";
+        style.textContent = ".mwe-popups{background:#fff;position:absolute;z-index:110;-webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;padding:0;font-size:14px;min-width:300px;border-radius:2px}.mwe-popups.mwe-popups-is-not-tall{width:320px}.mwe-popups .mwe-popups-container{color:#222;margin-top:-9px;padding-top:9px;text-decoration:none}.mwe-popups.mwe-popups-is-not-tall .mwe-popups-extract{min-height:40px;max-height:140px;overflow:hidden;margin-bottom:47px;padding-bottom:0}.mwe-popups .mwe-popups-extract{margin:16px;display:block;color:#222;text-decoration:none;position:relative} .mwe-popups.flipped_y:before{content:'';position:absolute;border:8px solid transparent;border-bottom:0;border-top: 8px solid #a2a9b1;bottom:-8px;left:10px}.mwe-popups.flipped_y:after{content:'';position:absolute;border:11px solid transparent;border-bottom:0;border-top:11px solid #fff;bottom:-7px;left:7px} .mwe-popups.mwe-popups-no-image-tri:before{content:'';position:absolute;border:8px solid transparent;border-top:0;border-bottom: 8px solid #a2a9b1;top:-8px;left:10px}.mwe-popups.mwe-popups-no-image-tri:after{content:'';position:absolute;border:11px solid transparent;border-top:0;border-bottom:11px solid #fff;top:-7px;left:7px}" + `
+            .wrap { text-shadow: transparent 0px 0px 0px, rgba(0,0,0,1) 0px 0px 0px !important; }
+
+            /* Grow out of the arrow. Opened above the word, the popup hangs upward from its bottom edge,
+               so it can grow when the definition arrives without being re-measured and moved. */
+            .mwe-popups { transform-origin: 18px top; transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1), transform 150ms cubic-bezier(0.23, 1, 0.32, 1); }
+            .mwe-popups.flipped_y { transform-origin: 18px bottom; transform: translateY(-100%); }
+            @starting-style {
+                .mwe-popups { opacity: 0; transform: scale(0.97); }
+                .mwe-popups.flipped_y { transform: translateY(-100%) scale(0.97); }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                @starting-style {
+                    .mwe-popups { transform: none; }
+                    .mwe-popups.flipped_y { transform: translateY(-100%); }
+                }
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .wrap { text-shadow: none !important; }
+                .mwe-popups { background: #2b2a33; }
+                .mwe-popups .mwe-popups-container, .mwe-popups .mwe-popups-extract { color: #fbfbfe; }
+                .mwe-popups.flipped_y:after { border-top-color: #2b2a33; }
+                .mwe-popups.mwe-popups-no-image-tri:after { border-bottom-color: #2b2a33; }
+                a { color: #8ab4f8; }
+            }
+        `;
         shadow.appendChild(style);
 
         var encapsulateDiv = document.createElement("div");
-        encapsulateDiv.style = "all: initial; text-shadow: transparent 0px 0px 0px, rgba(0,0,0,1) 0px 0px 0px !important;";
+        encapsulateDiv.className = "wrap";
+        encapsulateDiv.style = "all: initial;";
         shadow.appendChild(encapsulateDiv);
 
 
@@ -96,16 +123,11 @@
 
         var heading = document.createElement("h3");
         heading.style = "margin-block-end: 0px; display:inline-block;";
-        heading.textContent = "Searching";
+        heading.textContent = info.word;
 
         var meaning = document.createElement("p");
         meaning.style = "margin-top: 10px";
-        meaning.textContent = "Please Wait...";
-
-        var audio = document.createElement("div");
-        audio.className = "audio";
-        audio.innerHTML = "&nbsp;";
-        audio.style.display = "none";
+        meaning.textContent = "Looking up…";
 
         var moreInfo =document.createElement("a");
         moreInfo.href = `https://en.wiktionary.org/wiki/${encodeURIComponent(info.word)}`;
@@ -114,31 +136,23 @@
         moreInfo.rel = "noopener";
 
         content.appendChild(heading);
-        content.appendChild(audio);
         content.appendChild(meaning);
         content.appendChild(moreInfo);
-        document.body.appendChild(hostDiv);
-
         if(info.clientY < window.innerHeight/2){
             popupDiv.className = "mwe-popups mwe-popups-no-image-tri mwe-popups-is-not-tall";
-            hostDiv.style.top = info.bottom + 10 + "px";
-            if(info.height == 0){
-                hostDiv.style.top = parseInt(hostDiv.style.top) + 8 + "px";
-            }
+            hostDiv.style.top = info.bottom + 10 + (info.height == 0 ? 8 : 0) + "px";
         } else {
+            // flipped_y shifts the popup up by its own height (CSS), so this is where its bottom edge goes.
             popupDiv.className = "mwe-popups flipped_y mwe-popups-is-not-tall";
-            hostDiv.style.top = info.top - 10 - popupDiv.clientHeight + "px";
-
-            if(info.height == 0){
-                hostDiv.style.top = parseInt(hostDiv.style.top) - 8 + "px";
-            }
+            hostDiv.style.top = info.top - 10 - (info.height == 0 ? 8 : 0) + "px";
         }
+
+        document.body.appendChild(hostDiv);
 
         return { 
             heading, 
             meaning, 
-            moreInfo, 
-            audio 
+            moreInfo
         };
 
     }
@@ -150,30 +164,9 @@
     }
 
     function appendToDiv(createdDiv, content){
-        var hostDiv = createdDiv.heading.getRootNode().host;
-        var popupDiv = createdDiv.heading.getRootNode().querySelectorAll("div")[1];
-
-        var heightBefore = popupDiv.clientHeight;
         createdDiv.heading.textContent = content.word;
         createdDiv.meaning.textContent = content.meaning;
         createdDiv.moreInfo.textContent = "More »";
-
-        var heightAfter = popupDiv.clientHeight;
-        var difference = heightAfter - heightBefore;
-
-
-        if(popupDiv.classList.contains("flipped_y")){
-            hostDiv.style.top = parseInt(hostDiv.style.top) - difference + 1 + "px";
-        }
-
-        if(content.audioSrc){
-          var sound = document.createElement("audio");
-          sound.src = content.audioSrc;
-          createdDiv.audio.style.display  = "inline-block";
-          createdDiv.audio.addEventListener("click", function(){
-            sound.play();
-          });
-        }
     }
 
     function noMeaningFound (createdDiv){
