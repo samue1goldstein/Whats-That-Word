@@ -30,7 +30,7 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function fetchDefinitions (word) {
     return fetch(WIKTIONARY_API + encodeURIComponent(word), {
             credentials: 'omit',
-            headers: { 'Api-User-Agent': 'DictionaryAnywhere-fork (https://github.com/samue1goldstein/Dictionary)' }
+            headers: { 'Api-User-Agent': 'WhatsThatWord (https://github.com/samue1goldstein/Dictionary)' }
         })
         .then((response) => response.ok ? response.json() : null);
 }

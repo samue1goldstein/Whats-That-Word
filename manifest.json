@@ -1,8 +1,8 @@
 {
-  "author": "Suraj Jain",
+  "author": "samue1goldstein",
 
   "manifest_version": 2,
-  "name": "Dictionary Anywhere",
+  "name": "Whats That Word!",
   "version": "1.2.0",
 
   "description": "View definitions easily as you browse the web. Double-click any word to view its definition in a small pop-up bubble.",
