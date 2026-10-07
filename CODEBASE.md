@@ -17,7 +17,8 @@ Manifest V2. Uses the `browser.*` promise API (Firefox native; Chrome via the po
 ## Flow
 
 ```
-dblclick (dictionary.js:192)
+dblclick (dictionary.js:202)
+  -> ignored if the target is editable (input/textarea/select/contenteditable)
   -> TRIGGER_KEY check ('none' or e[`${key}Key`])
   -> showMeaning (:7)
        getSelectionInfo (:25)   trimmed selection text + bounding rect (needs non-empty)
@@ -28,8 +29,8 @@ dblclick (dictionary.js:192)
        extractMeaning (:43)     sendResponse({content})  content = {word, meaning, audioSrc: null} | null
        errors -> sendResponse({content: null})
        saveWord (:64) if history enabled
-  -> appendToDiv (dictionary.js:151) or noMeaningFound (:178)
-click anywhere not on the popup -> removeMeaning (:183) removes all .dictionaryDiv
+  -> appendToDiv (dictionary.js:152) or noMeaningFound (:179, shows "Search Wiktionary »")
+click anywhere not on the popup, or Escape -> removeAllPopups (:192) removes all .dictionaryDiv
 ```
 
 ## Definition source (background.js)
@@ -45,13 +46,13 @@ click anywhere not on the popup -> removeMeaning (:183) removes all .dictionaryD
 
 ```js
 {
-  language: 'en' | 'fr' | 'de' | 'es',             // default 'en'
+  language: 'en'|'nl'|'fr'|'de'|'it'|'ja'|'la'|'pl'|'pt'|'ru'|'es',  // default 'en'; language the user READS (definitions are always English)
   interaction: { dblClick: { key: 'none'|'ctrl'|'meta'|'alt'|'shift' } },  // default 'none'; 'meta' = Command on Mac
   history: { enabled: boolean },                   // default true
   definitions: { [word]: meaning }                 // history, written by background saveWord
 }
 ```
-The content script reads `language` and `interaction` **once** at injection (dictionary.js:207). Changed settings only apply to tabs loaded afterwards.
+The content script reads `language` and `interaction` **once** at injection (dictionary.js:221). Changed settings only apply to tabs loaded afterwards.
 
 ## Pop-up UI
 

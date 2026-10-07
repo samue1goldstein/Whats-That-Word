@@ -111,6 +111,7 @@
         moreInfo.href = `https://en.wiktionary.org/wiki/${encodeURIComponent(info.word)}`;
         moreInfo.style = "float: right; text-decoration: none;"
         moreInfo.target = "_blank";
+        moreInfo.rel = "noopener";
 
         content.appendChild(heading);
         content.appendChild(audio);
@@ -178,18 +179,30 @@
     function noMeaningFound (createdDiv){
       createdDiv.heading.textContent = "Sorry";
       createdDiv.meaning.textContent = "No definition found.";
+      createdDiv.moreInfo.textContent = "Search Wiktionary »";
     }
 
     function removeMeaning(event){
         var element = event.target;
         if(!element.classList.contains("dictionaryDiv")){
-            document.querySelectorAll(".dictionaryDiv").forEach(function(Node){
-                Node.remove();
-            });
+            removeAllPopups();
         }
     }
 
+    function removeAllPopups(){
+        document.querySelectorAll(".dictionaryDiv").forEach(function(Node){
+            Node.remove();
+        });
+    }
+
+    function isEditable(element){
+        return element.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(element.tagName);
+    }
+
     document.addEventListener('dblclick', ((e) => {
+        // Double-clicking in a text field means "select this word to edit it", not "define it".
+        if (isEditable(e.target)) { return; }
+
         if (TRIGGER_KEY === 'none') {
             return showMeaning(e);
         }
@@ -203,6 +216,7 @@
     }));
 
     document.addEventListener('click', removeMeaning);
+    document.addEventListener('keydown', (e) => { e.key === 'Escape' && removeAllPopups(); });
 
     (function () {
         let storageItem = browser.storage.local.get();
