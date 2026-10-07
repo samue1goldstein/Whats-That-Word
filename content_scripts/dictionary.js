@@ -26,7 +26,8 @@
         var selection = window.getSelection(),
             word = selection.toString().trim();
 
-        if (!word) { return null; }
+        // Cap what gets sent to Wiktionary: a word or short phrase, never a block of page text.
+        if (!word || word.length > 50) { return null; }
 
         var boundingRect = selection.getRangeAt(0).getBoundingClientRect();
 
