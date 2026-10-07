@@ -1,6 +1,8 @@
 # AI assistant files and settings (kept local, never committed)
 CLAUDE.md
 CLAUDE.local.md
+CODEBASE.md
+BUGREPORT.md
 .claude/
 .mcp.json
 AGENTS.md
