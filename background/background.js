@@ -6,12 +6,16 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // Wiktionary titles are case-sensitive: sentence-initial "Dog" should find "dog", but German nouns ("Haus") are capitalized.
     // Try both casings in the user's language first, then the original casing in any language.
+    // Each casing is fetched once, all in parallel, so a lookup costs one round trip.
     const lower = word.toLowerCase(),
-        casings = lang === 'de' ? [word, lower] : [lower, word];
+        casings = [...new Set(lang === 'de' ? [word, lower] : [lower, word])];
 
-    lookup(casings[0], lang, true)
-        .then((content) => content || (lower !== word ? lookup(casings[1], lang, true) : null))
-        .then((content) => content || lookup(word, lang, false))
+    Promise.all(casings.map(fetchDefinitions))
+        .then((pages) => {
+            const inUserLanguage = pages.map((data, i) => data && extractMeaning({ [lang]: data[lang] || [] }, casings[i], lang));
+
+            return inUserLanguage.find(Boolean) || extractMeaning(pages[casings.indexOf(word)] || {}, word, lang);
+        })
         .then((content) => {
             sendResponse({ content });
 
@@ -22,13 +26,13 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
-function lookup (word, lang, userLanguageOnly) {
+// Resolves to the raw response ({ en: [...], fr: [...], ... }), or null when Wiktionary has no entry.
+function fetchDefinitions (word) {
     return fetch(WIKTIONARY_API + encodeURIComponent(word), {
             credentials: 'omit',
             headers: { 'Api-User-Agent': 'DictionaryAnywhere-fork (https://github.com/samue1goldstein/Dictionary)' }
         })
-        .then((response) => response.ok ? response.json() : null)
-        .then((data) => data && extractMeaning(userLanguageOnly ? { [lang]: data[lang] || [] } : data, word, lang));
+        .then((response) => response.ok ? response.json() : null);
 }
 
 // Response is keyed by language code: { fr: [{ partOfSpeech, language, definitions: [{ definition: "<html>" }] }], en: [...], other: [...] }
